@@ -10307,7 +10307,7 @@ async function otherEvents({
     -> Building app
   `);
 
-  core.exportVariable('PUBLIC_URL', `/${pathByRepo}/${pathByHeadCommit}`);
+  core.exportVariable('PUBLIC_URL', `/${pathByHeadCommit}`);
   await exec(buildCmd);
 
   core.debug(`
