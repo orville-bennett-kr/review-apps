@@ -2,6 +2,8 @@ name: 'Build and deploy only on PR with label'
 on:
   pull_request:
     types: [labeled, unlabeled, opened, edited, closed, synchronize]
+    branches:
+      - force-real-life-usecase
 
 jobs:
   real-life:
@@ -33,7 +35,12 @@ jobs:
       - name: build -> deploy storybook
         uses: ./ # Replace here with sauloxd/review-apps@X.X.X
         with:
-          build-cmd: 'yarn run cra:storybook'
-          branch: 'review-apps'
-          dist: 'packages/cra-example/storybook-static'
-          slug: 'storybook'
+          branch: "review-apps"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          apps: |
+            {
+              "storybook": {
+                "build": "yarn run cra:storybook",
+                "dist": "packages/cra-example/storybook-static"
+              }
+            }

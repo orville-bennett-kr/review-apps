@@ -2,6 +2,10 @@ name: 'Deploy static app in branch to gh-pages'
 description: |
   Manages multiple static apps (or review-apps) for each branch in github pages
 
+runs:
+  using: 'node16'
+  main: 'packages/action/dist/index.js'
+
 inputs:
   build-cmd:
     description: |
@@ -9,7 +13,8 @@ inputs:
       For example, if you use "create-react-app", this would be "yarn build".
       IMPORTANT: If your app doesn't use HashRouting (the #/ in url), use process.env.PUBLIC_URL to correctly configure it.
       See FAQ and https://www.gatsbyjs.com/docs/path-prefix/ for more info.
-    default: 'yarn build'
+      Also you can skip building your apps if you did it in a previous step.
+      Remember that the "dist" path should be pointing to your app's build
 
   branch:
     description: |
@@ -21,19 +26,29 @@ inputs:
   dist:
     description: |
       The directory where you build artifacts will live.
-      For example, if you use create-react-app, it will be the "dist" directory. If you use a monorepo setup, please add the relative the path relative from the project root or an absolute path'
+      For example, if you use create-react-app, it will be the "dist" directory. If you use a monorepo setup, please add the path relative from project's root or an absolute path'
     default: 'dist'
 
   slug:
     description: |
       The default URL for every app is: https://{ GH_USER_NAME }.github.io/{ REPOSITORY }/{ SLUG }/{ BRANCH_NAME }/{ HEAD_COMMIT }
-      Where SLUG defaults to `review-apps`. For multiple types of apps inside the same repository (i.e. APP & STORYBOOK), provide an uniq slug.
-      Example: If you want something like: https://sauloxd.github.io/my-app/storybooks/ft-home-1231bdhb, pass string "storybooks"
+      For multiple types of apps inside the same repository (i.e. APP & STORYBOOK), provide an uniq slug.
+      Example: If you want something like: https://sauloxd.github.io/my-app/storybooks/ft-home-1231bdhb, pass string "storybooks" so it doesn't override other apps inside same respository.
     default: 'review-apps'
 
-runs:
-  using: 'node12'
-  main: 'packages/action/dist/index.js'
+  GITHUB_TOKEN:
+    description: |
+      To allow action to comment the app urls in your pull request, please pass {{secrets.GITHUB_TOKEN}} to allow action to interact with your pull request.
+      To see why it is needed, see: https://github.com/actions/toolkit/tree/main/packages/github
+
+  skip-index-html:
+    description: |
+      Skip creating and overriden index.html in github pages branch.
+    default: false
+
+  apps:
+    description: |
+      JSON config for all apps that will be managed by this action
 
 branding:
   icon: 'package'
